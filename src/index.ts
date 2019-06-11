@@ -17,8 +17,8 @@ log4js.configure({
 const logger = log4js.getLogger("filelogger");
 
 const webhookServer = new WebhookServer(port, secret);
-webhookServer.addListener((payload) => {
-    if (payload.ref === "refs/heads/" + branch) {
+webhookServer.addListener((pushEvent) => {
+    if (pushEvent.ref === "refs/heads/" + branch) {
         exec("cd " + repoPath + " && git pull", (error, stdout, stderr) => {
             logger.info(stdout);
             if (stderr) {

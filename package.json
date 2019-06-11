@@ -15,15 +15,14 @@
     "license": "ISC",
     "devDependencies": {
         "tslint": "^5.17.0",
-        "typescript": "^3.5.1"
+        "typescript": "^3.5.1",
+        "ts-node-dev": "^1.0.0-pre.39"
     },
     "dependencies": {
         "@types/dotenv": "^6.1.1",
         "@types/express": "^4.17.0",
-        "body-parser": "^1.19.0",
         "dotenv": "^8.0.0",
-        "express": "^4.17.1",
-        "log4js": "^4.3.1",
-        "ts-node-dev": "^1.0.0-pre.39"
+        "github-webhook-event-types": "^1.2.1",
+        "log4js": "^4.3.1"
     }
 }
