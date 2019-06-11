@@ -19,51 +19,60 @@ export class WebhookServer {
     }
 
     private requestListener(request: IncomingMessage, response: ServerResponse): void {
-        if (request.method !== "POST") {
-            response.statusCode = 405;
-            response.statusMessage = "Method Not Allowed";
-            response.write("Method Not Allowed");
-            response.end();
-            return;
-        }
-
-        let body: string = "";
-        request.on("data", (chunk: any) => { body += chunk; });
+        let body: string = '';
+        request.on("data", (chunk: any) => body += chunk);
 
         request.on("end", () => {
-            const sig = "sha1=" + crypto.createHmac("sha1", this.secret).update(body).digest("hex");
-
-            if (sig !== request.headers["x-hub-signature"]) {
-                response.statusCode = 401;
-                response.statusMessage = "Unauthorized";
-                response.write("Unauthorized");
-                response.end();
+            if( !this.isRequestValidGihubHook(body, request) ){
+                this.writeErrorResponse(response, 405, 'Method Not Allowed');
                 return;
             }
 
-            if (typeof request.headers["x-github-event"] !== "string") {
-                response.statusCode = 405;
-                response.statusMessage = "Method Not Allowed";
-                response.write("Method Not Allowed");
-                response.end();
-                return;
-            }
-
-            const event = request.headers["x-github-event"];
-            if (event !== GithubEvents.PUSH) {
-                response.statusCode = 405;
-                response.statusMessage = "Method Not Allowed";
-                response.write("Method Not Allowed");
-                response.end();
-                return;
+            if( !this.isRequestSignatureValid(request, body) ){
+                this.writeErrorResponse(response, 401, 'Unauthorized');
+                return
             }
 
             const payload: githubTypes.IPayload = JSON.parse(body);
-
             this.listener.forEach((listener) => listener(payload));
 
             response.write("ok");
             response.end();
         });
+    }
+
+    private isRequestValidGihubHook(body: string, request: IncomingMessage): boolean {
+        if (request.method !== 'POST') {
+            return false;
+        }
+
+        if (typeof request.headers["x-github-event"] !== "string") {
+            return false;
+        }
+
+        const event = request.headers["x-github-event"];
+        if (event !== GithubEvents.PUSH) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private isRequestSignatureValid(request: IncomingMessage, body: string): boolean {
+        const signature = "sha1=" + crypto.createHmac("sha1", this.secret).update(body).digest("hex");
+
+        if (request.headers["x-hub-signature"] !== signature) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private writeErrorResponse(response: ServerResponse, statusCode: number, message: string): ServerResponse {
+        response.statusCode = statusCode;
+        response.statusMessage = message;
+        response.write(message);
+        response.end();
+        return response;
     }
 }
