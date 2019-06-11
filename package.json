@@ -1,7 +1,7 @@
 {
-    "name": "github-webhook",
+    "name": "github-webhook-server",
     "version": "1.0.0",
-    "description": "",
+    "description": "Receive webhooks from github and execude registerd callback functions with full typed Webhook Payload.",
     "main": "dist/index.js",
     "scripts": {
         "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
