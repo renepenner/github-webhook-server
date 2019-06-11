@@ -5,8 +5,9 @@ import * as githubTypes from "./types/github/PushPayload";
 
 export class WebhookServer {
     private server: Server;
-    private listener: Array<(payload: githubTypes.IPayload) => void> = [];
     private secret: string;
+
+    private listener: Array<(payload: githubTypes.IPayload) => void> = [];
 
     constructor(port: number, secret: string) {
         this.server = new Server(this.requestListener.bind(this));
@@ -50,8 +51,7 @@ export class WebhookServer {
             return false;
         }
 
-        const event = request.headers["x-github-event"];
-        if (event !== GithubEvents.PUSH) {
+        if (request.headers["x-github-event"] !== GithubEvents.PUSH) {
             return false;
         }
 
