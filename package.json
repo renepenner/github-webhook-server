@@ -23,6 +23,6 @@
         "@types/express": "^4.17.0",
         "dotenv": "^8.0.0",
         "github-webhook-event-types": "^1.2.1",
-        "log4js": "^4.3.1"
+        "log4js": "^6.4.0"
     }
 }
